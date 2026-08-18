@@ -1,0 +1,12 @@
+<table>
+    <tbody>
+        {val.map((row)=>(
+            <tr key={row.Id}>
+                <td>{row.Id}</td>
+                <td>{row.Link}</td>
+                <td>{row.Email}</td>
+                <td>{row.Password}</td>
+            </tr>
+        ))}
+    </tbody>
+</table>

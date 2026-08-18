@@ -118,8 +118,36 @@ const getuniqueID=async(req,res)=>{
 }
 
 
+const DeleteRecord=async(req,res)=>{
+    try{
+        const link=req.body.link;
+        if(!link) {
+            return res.status(400).json({
+                status:"error",
+                message:"please provide id"
+            })
+        }
+        const deleteIDs = await prisma.Records.delete({
+            where: {
+                Link: link,
+            }
+        });
+
+        return res.status(200).json({
+            stauts:"sucess deleted",
+            data:deleteIDs
+        })
+    }catch(err){
+        return res.status(500).json({
+            status:"error",
+            message:err.message
+        })
+    }
+}
+
 module.exports={
     getalldata,
     getuniqueID,
-    addNewRecord
+    addNewRecord,
+    DeleteRecord
 }
