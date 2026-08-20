@@ -1,5 +1,6 @@
 const { PrismaClient } = require("../generated/prisma/index.js");
 const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
+const validator = require('validator');
 const adapter=new PrismaMariaDb({
     host:"127.0.0.1",
     user:"root",
@@ -16,24 +17,24 @@ const prisma = new PrismaClient({adapter});
 const addNewRecord= async(req,res)=>{
     try{
         const email=req.body.email;
-        if(!email) {
+        if(!email || !validator.isEmail(email)) {
             return res.status(400).json({
                 status:'error',
                 massage:"please provide username or email"
             });
         }
         const password=req.body.password;
-        if(!password){
+        if(!password  ){
             return res.status(400).json({
                 status:"error",
                 message:"plese provide pasword"
             });
         }
         const link=req.body.link;
-        if(!link){
+        if(!link || !validator.isURL(link, { require_protocol: true })){
             return res.status(400).json({
                 status:"error",
-                message:"please provide link"
+                message:"Please provide a valid URL starting with http:// or https://"
             });
         }
 
