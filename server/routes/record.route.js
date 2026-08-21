@@ -1,10 +1,17 @@
-const express=require("express")
-const router=express.Router();
-const RecordController=require("../controllers/Record.controller");
-router.post('/add',RecordController.addNewRecord);
-router.get('/',RecordController.getalldata);
-router.get('/',RecordController.getuniqueID);
-router.delete('/del',RecordController.DeleteRecord)
+const express = require("express");
+const router = express.Router();
+const {
+  addNewRecord,
+  getalldata,
+  getuniqueID,
+  DeleteRecord,
+  updateData,
+} = require("../controllers/Record.controller");
 
-module.exports=router;
+router.post("/add", addNewRecord);
+router.get("/", getalldata);
+router.get("/", getuniqueID);
+router.delete("/del", DeleteRecord);
+router.patch("/update", updateData);
 
+module.exports = router;
