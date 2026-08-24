@@ -6,12 +6,15 @@ const {
   getuniqueID,
   DeleteRecord,
   updateData,
+  getSortedData
 } = require("../controllers/Record.controller");
 
 router.post("/add", addNewRecord);
 router.get("/", getalldata);
 router.get("/", getuniqueID);
+router.get("/:orderBy/:sortBy", getSortedData);
 router.delete("/del", DeleteRecord);
 router.patch("/update", updateData);
+
 
 module.exports = router;

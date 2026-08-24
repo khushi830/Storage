@@ -15,30 +15,30 @@ const prisma = new PrismaClient({ adapter });
 
 const addNewRecord = async (req, res) => {
   try {
-    const email = req.body.email;
-    if (!email || !validator.isEmail(email)) {
-      return res.status(200).json({
-        status: "error",
-        message: "please provide valid username or email",
-      });
-    }
     const password = req.body.password;
-    if (!password) {
-      return res.status(400).json({
-        status: "error",
-        message: "plese provide  pasword",
-      });
-    }
-    console.log("dasdsa");
 
     const link = req.body.link;
     if (!link || !validator.isURL(link)) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "error",
         message: "Please provide a valid URL starting with http:// or https://",
       });
     }
-    console.log("dasdsa");
+
+    const email = req.body.email;
+    if (!email || !validator.isEmail(email)) {
+      return res.status(400).json({
+        status: "error",
+        message: "please provide valid username or email",
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        status: "error",
+        message: "please provide  pasword",
+      });
+    }
 
     const existinglink = await prisma.Records.findUnique({
       where: { Link: link },
@@ -72,6 +72,7 @@ const addNewRecord = async (req, res) => {
       data: createnew,
     });
   } catch (err) {
+    console.log(err).message;
     return res.status(500).json({
       status: "error",
       message: err.message,
@@ -150,68 +151,121 @@ const updateData = async (req, res) => {
     const link = req.body.link;
     const password = req.body.password;
     const email = req.body.email;
-    const id = req.body.id;
+    const ID = req.body.id;
 
-    if (!id) {
-      return res.status(400).json({
+    if (!ID) {
+      return res.status(200).json({
         status: "error",
-        message: "please provide id",
+        message: "please provide  ID",
       });
     }
 
-    let data = await prisma.Records.findUnique({
+    const existingId = await prisma.Records.findUnique({
       where: {
-        Id: id,
+        Id: ID,
       },
     });
 
-    if (!data) {
-      return res.status(400).json({
+    if (!existingId) {
+      return res.status(200).json({
         status: "error",
-        message: "id not found",
+        message: "please provide  valid ID",
       });
-    }
-    const value = {};
-    let upemail, uppass, uplink;
-    if (email && !validator.isEmail(email)) {
-      return res.status(400).json({
-        status: "error",
-        message: "please provide valid id",
-      });
-    } else if (email) {
-      value.email = email;
     }
 
-    if (link && validator.isURL(link, { require_protocol: true })) {
-      return;
-    }
+    const { Link, Email, Password } = existingId;
+    const prev = {
+      Link: Link,
+      Email: Email,
+      Password: Password,
+    };
 
-    if (password) {
-      uppass = await prisma.Records.update({
-        where: {
-          Id: id,
-        },
-        data: {
-          Password: password,
-        },
-      });
+    console.log(prev);
+    const data = {};
+
+    data.Password = password;
+
+    // 2. Email check and validation
+    if (prev.Email !== email) {
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({
+          // Changed to 400 bad request
+          status: "error",
+          message: "please provide valid email",
+        });
+      }
     }
-    data = await prisma.Records.findUnique({
+    data.Email = email;
+
+    // 3. Link check and validation
+    if (prev.Link !== link) {
+      if (!validator.isURL(link, { require_protocol: true })) {
+        return res.status(400).json({
+          // Changed to 400 bad request
+          status: "error",
+          message: "please provide valid link",
+        });
+      }
+    }
+    data.Link = link;
+
+    const uppass = await prisma.Records.update({
       where: {
-        Id: id,
+        Id: ID,
       },
+      data: data,
     });
     return res.status(200).json({
       statua: "sucess",
       message: "successfully updated",
-      data: data,
+      data: uppass,
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      status: "error",
-      message: "internal server error",
+    return res
+      .status(500)
+      .json({ status: "error", message: "Internal server error" });
+  }
+};
+
+const getSortedData = async (req, res) => {
+  try{
+      
+    const sortBy=req.params.sortBy;
+    const orderBy=req.params.orderBy;
+    //orderby can be link password email what is its value will sort by it sort by asc or dsc
+    const fieldMap = {
+      email: "Email",
+      link: "Link",
+      password: "Password",
+    };
+    const dbField = fieldMap[orderBy];
+    
+    if (!dbField) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid orderBy parameter. Must be email, link, or password.",
+      });
+    }
+    const sortDirection = sortBy === "desc" ? "desc" : "asc";
+    
+    const data=await prisma.Records.findMany({
+      orderBy:{
+        [dbField]:sortDirection ,
+      }
     });
+    
+
+    return res.status(200).json({
+      status:"sucess",
+      data:data
+    })
+
+  }catch(err){
+    return res.status(500).json({
+      status:"error",
+      message:err.message
+    })
   }
 };
 
@@ -221,4 +275,5 @@ module.exports = {
   addNewRecord,
   DeleteRecord,
   updateData,
+  getSortedData
 };
