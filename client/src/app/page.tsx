@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+// import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 type Rows = {
@@ -25,7 +26,20 @@ const fetchdata = async () => {
     console.log(row);
     return row;
   } catch (err) {
-    console.log(err);
+    if (axios.isAxiosError(err)) {
+      // TypeScript now safely knows 'err' is an AxiosError
+      if (err.response) {
+        console.log("Exact Backend Error:", err.response.data);
+        alert(`Failed to save: ${JSON.stringify(err.response.data)}`);
+        setErrorMessage(err.response.data.message);
+        console.log(errorMessage);
+      } else {
+        console.log("Network Error:", err.message);
+      }
+    } else {
+      // Handles generic, non-network JavaScript errors
+      console.log("Unexpected Error:", err);
+    }
   }
 };
 
@@ -225,26 +239,73 @@ const Page = () => {
     }
   };
 
+  const handleSort = (field: string) => {
+    const params = new URLSearchParams(window.location.search);
+
+    const currentField = params.get("sortBy");
+    const currentOrder = params.get("orderBy");
+
+    let order = "asc";
+
+    if (currentField === field) {
+        order = currentOrder === "asc" ? "desc" : "asc";
+    }
+
+    params.set("sortBy", field);
+    params.set("orderBy", order);
+
+    router.replace(`/?${params.toString()}`, {
+        scroll: false
+    });
+};
   useEffect(() => {
-    const fetchdata = async () => {
+    // const fetchdata = async () => {
+    //   try {
+    //     const data = await axios.get(
+    //       "http://localhost:5000/${orderBy}/${sortBy}",
+    //       {
+    //         headers: {
+    //           "content-Type": "application/json",
+    //         },
+    //       },
+    //     );
+
+    //     setval(data.data.data);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // };
+    // if (orderBy && sortBy) {
+    //   fetchdata();
+    // }
+    if (!orderBy || !sortBy) return;
+
+    const fetchSortedData = async () => {
       try {
         const data = await axios.get(
-          "http://localhost:5000/${orderBy}/${sortBy}",
-          {
-            headers: {
-              "content-Type": "application/json",
-            },
-          },
+          `http://localhost:5000/${sortBy}/${orderBy}`,
         );
 
         setval(data.data.data);
       } catch (err) {
-        console.log(err);
+        if (axios.isAxiosError(err)) {
+          // TypeScript now safely knows 'err' is an AxiosError
+          if (err.response) {
+            console.log("Exact Backend Error:", err.response.data);
+            alert(`Failed to save: ${JSON.stringify(err.response.data)}`);
+            setErrorMessage(err.response.data.message);
+            console.log(errorMessage);
+          } else {
+            console.log("Network Error:", err.message);
+          }
+        } else {
+          // Handles generic, non-network JavaScript errors
+          console.log("Unexpected Error:", err);
+        }
       }
     };
-    if (orderBy && sortBy) {
-      fetchdata();
-    }
+
+    fetchSortedData();
   }, [sortBy, orderBy]);
 
   useEffect(() => {
@@ -508,27 +569,52 @@ const Page = () => {
                   <th className="px-6 py-5 w-20 text-xs font-bold text-blue-500 uppercase tracking-wider text-center">
                     S.no
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold cursor-pointer text-blue-500 uppercase tracking-wider">
+                  <th
+                    className="px-6 py-5 text-xs font-bold cursor-pointer text-blue-500 uppercase tracking-wider"
+                    onClick={() => {
+                      if (sortBy !== "link") {
+                        setSortBy("link");
+                        setOrderBy("asc");
+                      } else {
+                        setOrderBy(orderBy === "asc" ? "desc" : "asc");
+                      }
+                    }}
+                  >
                     Link
                   </th>
                   <th
-                    className="px-6 py-5 text-xs font-bold text-blue-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors group select-none flex-row items-center gap-1"
+                    className="px-6 flex flex-row py-5 text-xs    items-center font-bold text-blue-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors group select-none flex-row items-center gap-1"
+                    // onClick={() => handleSort("email")}
                     onClick={() => {
                       if (sortBy !== "email") {
                         setSortBy("email");
                         setOrderBy("asc");
                       } else {
-                        if (orderBy === "asc") setOrderBy("desc");
-                        else setOrderBy("asc");
+                        setOrderBy(orderBy === "asc" ? "desc" : "asc");
                       }
                     }}
                   >
                     Email
                     <span className="inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      ↕
+                      <Image
+                        src="/downArrow.svg"
+                        alt="downArrow"
+                        width={12}
+                        height={12}
+                      />
                     </span>
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold cursor-pointer text-blue-500 uppercase tracking-wider">
+                  <th
+                    className="px-6 py-5 text-xs font-bold cursor-pointer text-blue-500 uppercase tracking-wider"
+                    onClick={() => {
+                      if (sortBy !== "password") {
+                        setSortBy("password");
+                        setOrderBy("asc");
+                      } else {
+                        setOrderBy(orderBy === "asc" ? "desc" : "asc");
+                      }
+                    }}
+                  >
                     Password
                   </th>
                   <th className="px-6 py-5 text-xs font-bold  text-blue-500 uppercase tracking-wider text-center">

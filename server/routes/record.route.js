@@ -12,7 +12,7 @@ const {
 router.post("/add", addNewRecord);
 router.get("/", getalldata);
 router.get("/", getuniqueID);
-router.get("/:orderBy/:sortBy", getSortedData);
+router.get("/:sortBy/:orderBy", getSortedData);
 router.delete("/del", DeleteRecord);
 router.patch("/update", updateData);
 

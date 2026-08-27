@@ -229,43 +229,42 @@ const updateData = async (req, res) => {
 };
 
 const getSortedData = async (req, res) => {
-  try{
-      
-    const sortBy=req.params.sortBy;
-    const orderBy=req.params.orderBy;
-    //orderby can be link password email what is its value will sort by it sort by asc or dsc
+  try {
+    const sortBy = req.params.sortBy;
+    const orderBy = req.params.orderBy;
+
     const fieldMap = {
       email: "Email",
       link: "Link",
       password: "Password",
+      id: "Id"
     };
-    const dbField = fieldMap[orderBy];
-    
-    if (!dbField) {
+
+    if (!fieldMap[sortBy]) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid orderBy parameter. Must be email, link, or password.",
+        message: "Invalid sortBy parameter"
       });
     }
-    const sortDirection = sortBy === "desc" ? "desc" : "asc";
-    
-    const data=await prisma.Records.findMany({
-      orderBy:{
-        [dbField]:sortDirection ,
+
+    const sortDirection = orderBy === "desc" ? "desc" : "asc";
+
+    const data = await prisma.Records.findMany({
+      orderBy: {
+        [fieldMap[sortBy]]: sortDirection
       }
     });
-    
 
     return res.status(200).json({
-      status:"sucess",
-      data:data
-    })
+      status: "success",
+      data: data
+    });
 
-  }catch(err){
+  } catch (err) {
     return res.status(500).json({
-      status:"error",
-      message:err.message
-    })
+      status: "error",
+      message: err.message
+    });
   }
 };
 
