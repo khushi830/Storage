@@ -14,7 +14,7 @@ datasource db {
 
 model Records{
   Id Int @id @default(autoincrement())
-  Link String 
+  Link String @unique
   Email String 
   Password String 
 }

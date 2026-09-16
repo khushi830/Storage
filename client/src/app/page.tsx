@@ -62,7 +62,9 @@ const Page = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [num, setNum] = useState(false);
   const [symbols, setSymbols] = useState(false);
+  // const[updateErr,setUpdateErr]=useState<string|null>(null);
   const router = useRouter();
+
   const pathname = usePathname();
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -190,6 +192,7 @@ const Page = () => {
         setval(data);
       });
       setForm(false);
+      setErrorMessage(null);
 
       // window.location.reload();
     } catch (err) {
@@ -916,7 +919,10 @@ const Page = () => {
                 autoFocus
                 onClick={() => {
                   handleSave();
-                  setErrorMessage(null);
+                  // setErrorMessage(null);
+                  setEmail("");
+                  setPassword("");
+                  setLink("");
                 }}
               >
                 Save Record
