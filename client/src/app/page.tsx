@@ -16,7 +16,7 @@ type Rows = {
 
 const fetchdata = async () => {
   try {
-    const data = await axios.get("http://localhost:5000", {
+    const data = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}`, {
       headers: {
         "content-Type": "application/json",
       },
@@ -100,7 +100,7 @@ const Page = () => {
     try {
       // Send the updated data to your backend (adjust the URL/method to match your backend)
       await axios.patch(
-        "http://localhost:5000/update",
+        `${process.env.NEXT_PUBLIC_API_URL}/update`,
         {
           id: id,
           link: editFormData.link,
@@ -175,7 +175,7 @@ const Page = () => {
   const handleSave = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/add",
+        `${process.env.NEXT_PUBLIC_API_URL}/add`,
         {
           link: link,
           email: email,
@@ -216,7 +216,7 @@ const Page = () => {
     if (!linkToDelete) return;
 
     try {
-      await axios.delete("http://localhost:5000/del", {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/del`, {
         data: { id: linkToDelete },
         headers: {
           "Content-Type": "application/json",
@@ -265,7 +265,7 @@ const Page = () => {
     // const fetchdata = async () => {
     //   try {
     //     const data = await axios.get(
-    //       "http://localhost:5000/${orderBy}/${sortBy}",
+    //       `${process.env.NEXT_PUBLIC_API_URL}/${orderBy}/${sortBy}`,
     //       {
     //         headers: {
     //           "content-Type": "application/json",
@@ -286,7 +286,7 @@ const Page = () => {
     const fetchSortedData = async () => {
       try {
         const data = await axios.get(
-          `http://localhost:5000/${sortBy}/${orderBy}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/${sortBy}/${orderBy}`,
         );
 
         setval(data.data.data);
