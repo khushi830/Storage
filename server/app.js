@@ -5,13 +5,16 @@ const app=express();
 const cros=require("cors");
 
 const route=require("./routes/record.route");
-const Port=process.env.Port|| 5000;app.use(express.json());
-app.use(cros());
+const PORT=process.env.Port;
+app.use(express.json());
+app.use(cros({
+    origin: process.env.CORS_ORIGIN
+}));
 app.use('/',route);
 
-app.listen(Port,()=>{
+app.listen(PORT,'0.0.0.0',()=>{
     try{
-        console.log(`server is running on : http://localhost:${Port}/`);
+        console.log(`server is running on : http://localhost:${PORT}/`);
 
     }catch(err){
         console.log(err);

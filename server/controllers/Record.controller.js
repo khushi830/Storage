@@ -1,12 +1,13 @@
 const { PrismaClient } = require("../generated/prisma/index.js");
 const { PrismaMariaDb } = require("@prisma/adapter-mariadb");
 const validator = require("validator");
+
 const adapter = new PrismaMariaDb({
-  host: "127.0.0.1",
-  user: "root",
-  password: "mypassword",
-  database: "Email_Password_Records",
-  port: 3306,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: parseInt(process.env.DB_PORT),
   allowPublicKeyRetrieval: true,
   useSSL: false,
 });
